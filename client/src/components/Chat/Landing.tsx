@@ -16,7 +16,6 @@ import { useChatContext, useAgentsMapContext, useAssistantsMapContext } from '~/
 import { useGetEndpointsQuery, useGetStartupConfig } from '~/data-provider';
 import { useLocalize, useAuthContext, useGreeting } from '~/hooks';
 import AgentContact from '~/components/Agents/AgentContact';
-import ConvoIcon from '~/components/Endpoints/ConvoIcon';
 import temporaryStore from '~/store/temporary';
 
 const containerClassName =
@@ -157,21 +156,16 @@ export default function Landing({ centerFormOnLanding }: { centerFormOnLanding: 
         <div
           className={`flex ${textHasMultipleLines ? 'flex-col' : 'flex-col md:flex-row'} items-center justify-center gap-2`}
         >
-          <div className={`relative size-10 justify-center ${textHasMultipleLines ? 'mb-2' : ''}`}>
+          <div className={`relative size-20 justify-center ${textHasMultipleLines ? 'mb-2' : ''}`}>
             {isTemporary ? (
               <div className={containerClassName}>
                 <HatGlasses className="h-2/3 w-2/3 text-text-primary" aria-hidden="true" />
               </div>
             ) : (
-              <ConvoIcon
-                agentsMap={agentsMap}
-                assistantMap={assistantMap}
-                conversation={conversation}
-                endpointsConfig={endpointsConfig}
-                containerClassName={containerClassName}
-                context="landing"
-                className="h-2/3 w-2/3 text-text-primary"
-                size={41}
+              <img
+                src="/assets/bsu_logo.png"
+                alt={localize('com_ui_logo', { 0: startupConfig?.appTitle ?? 'BSU Research AI' })}
+                className="h-full w-full object-contain"
               />
             )}
             {startupConfig?.showBirthdayIcon && (

@@ -7,7 +7,6 @@ import AnthropicIcon from '../../svgs/AnthropicIcon';
 import MoonshotIcon from '../../svgs/MoonshotIcon';
 import BedrockIcon from '../../svgs/BedrockIcon';
 import GeminiIcon from '../../svgs/GeminiIcon';
-import GPTIcon from '../../svgs/GPTIcon';
 import XAIcon from '../../svgs/XAIcon';
 
 type ProviderArtComponent = ComponentType<SVGProps<SVGSVGElement> & { size?: number }>;
@@ -36,16 +35,6 @@ const component = (Component: ProviderArtComponent): ProviderArt => ({
   Component,
 });
 
-const openAIBrandColor = (model: string): string => {
-  const value = model.toLowerCase();
-  if (/\b(o\d)\b/.test(value) || /\bgpt-[5-9](?:\.\d+)?\b/.test(value)) {
-    return 'var(--provider-openai-reasoning, #000000)';
-  }
-  return value.includes('gpt-4')
-    ? 'var(--provider-openai-gpt4, #AB68FF)'
-    : 'var(--provider-openai, #19C37D)';
-};
-
 const googleByModel = (model: string): Partial<ProviderIconDef> | undefined => {
   const value = model.toLowerCase();
   if (/gemini|learnlm/.test(value)) {
@@ -59,11 +48,8 @@ const googleByModel = (model: string): Partial<ProviderIconDef> | undefined => {
 
 export const providerIcons: Record<ProviderId, ProviderIconDef> = {
   [ProviderId.openai]: {
-    art: component(GPTIcon),
+    art: asset('assets/bsu_logo.png'),
     label: 'OpenAI',
-    mono: true,
-    brandColor: 'var(--provider-openai, #19C37D)',
-    byModel: (model) => ({ brandColor: openAIBrandColor(model) }),
   },
   [ProviderId.anthropic]: {
     art: component(AnthropicIcon),
