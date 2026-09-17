@@ -9,7 +9,9 @@ services:
     depends_on:
       - mongodb
       - rag_api
-    image: registry.librechat.ai/danny-avila/librechat-dev:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     restart: always
     user: "${UID}:${GID}"
     extra_hosts:
@@ -37,6 +39,7 @@ services:
       - ./logs:/app/logs
       - ./skill:/app/skill
       - librechat-data:/app/data
+      - ./librechat.yaml:/app/librechat.yaml
   admin-panel:
     container_name: admin-panel
     image: registry.librechat.ai/clickhouse/librechat-admin-panel:latest
