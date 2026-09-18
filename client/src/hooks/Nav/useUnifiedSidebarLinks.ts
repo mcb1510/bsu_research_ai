@@ -28,7 +28,8 @@ export default function useUnifiedSidebarLinks() {
     () => startupConfig?.interface ?? defaultInterface,
     [startupConfig],
   );
-  const insightsFeatureEnabled = startupConfig?.insightsEnabled === true;
+  const insightsFeatureEnabled =
+    startupConfig?.insightsEnabled === true && interfaceConfig.sidePanelEntries?.insights !== false;
   const isInsightsRoute = location.pathname.startsWith('/insights');
   const { data: insightsAccess, isLoading: isInsightsAccessLoading } = useInsightsAccessQuery(
     user?.id,

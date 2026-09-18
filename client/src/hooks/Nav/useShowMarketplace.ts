@@ -1,5 +1,6 @@
 import { useContext, useMemo } from 'react';
 import { PermissionTypes, Permissions } from 'librechat-data-provider';
+import { useGetStartupConfig } from '~/data-provider';
 import { useHasAccess, AuthContext } from '~/hooks';
 
 /**
@@ -13,6 +14,8 @@ import { useHasAccess, AuthContext } from '~/hooks';
  */
 export default function useShowMarketplace(): boolean {
   const authContext = useContext(AuthContext);
+  const { data: startupConfig } = useGetStartupConfig();
+  const marketplaceEntryEnabled = startupConfig?.interface?.sidePanelEntries?.marketplace !== false;
 
   const hasAccessToAgents = useHasAccess({
     permissionType: PermissionTypes.AGENTS,
@@ -33,5 +36,5 @@ export default function useShowMarketplace(): boolean {
   );
 
   // Show agent marketplace when marketplace permission is enabled, auth is ready, and user has access to agents
-  return authReady && hasAccessToAgents && hasAccessToMarketplace;
+  return marketplaceEntryEnabled && authReady && hasAccessToAgents && hasAccessToMarketplace;
 }

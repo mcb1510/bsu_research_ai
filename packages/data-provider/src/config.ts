@@ -2040,6 +2040,31 @@ export const interfaceSchema = z
       .optional(),
     fileSearch: z.boolean().optional(),
     fileCitations: z.boolean().optional(),
+    /**
+     * Direct on/off switches for individual left side panel entries, independent of the
+     * role-permission system (which only seeds DB permissions once and is managed
+     * per-deployment via the admin panel thereafter). A field left unset here defaults to
+     * shown, so omitting `sidePanelEntries` entirely reproduces prior behavior. Each entry
+     * still passes through its existing permission/capability check; this only adds a way to
+     * force one off (or back on) from the config file, without touching role permissions.
+     * Distinct from the legacy (removed) `sidePanel` boolean, which hid the whole panel.
+     */
+    sidePanelEntries: z
+      .object({
+        agentBuilder: z.boolean().optional(),
+        assistantBuilder: z.boolean().optional(),
+        skills: z.boolean().optional(),
+        schedules: z.boolean().optional(),
+        prompts: z.boolean().optional(),
+        memories: z.boolean().optional(),
+        bookmarks: z.boolean().optional(),
+        files: z.boolean().optional(),
+        parameters: z.boolean().optional(),
+        mcpServers: z.boolean().optional(),
+        insights: z.boolean().optional(),
+        marketplace: z.boolean().optional(),
+      })
+      .optional(),
     traceViewer: traceViewerSchema.optional(),
     /** Tool keys (and `'mcp'` or an MCP server name) pinned to the prompt bar by default */
     defaultPinnedTools: z.array(z.string()).optional(),

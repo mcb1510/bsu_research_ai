@@ -99,10 +99,13 @@ export default function useSideNavLinks({
   const { agentsConfig } = useGetAgentsConfig({ endpointsConfig });
   const { skillsEnabled } = useAgentCapabilities(agentsConfig?.capabilities);
 
+  const sidePanelEntries = interfaceConfig.sidePanelEntries;
+
   const Links = useMemo(() => {
     const links: NavLink[] = [];
 
     if (
+      sidePanelEntries?.agentBuilder !== false &&
       endpointsConfig?.[EModelEndpoint.agents] &&
       hasAccessToAgents &&
       hasAccessToCreateAgents &&
@@ -118,6 +121,7 @@ export default function useSideNavLinks({
     }
 
     if (
+      sidePanelEntries?.assistantBuilder !== false &&
       isAssistantsEndpoint(endpoint) &&
       ((endpoint === EModelEndpoint.assistants &&
         endpointsConfig?.[EModelEndpoint.assistants] &&
@@ -136,7 +140,7 @@ export default function useSideNavLinks({
       });
     }
 
-    if (hasAccessToSkills && skillsEnabled) {
+    if (sidePanelEntries?.skills !== false && hasAccessToSkills && skillsEnabled) {
       links.push({
         title: 'com_ui_skills',
         label: '',
@@ -156,7 +160,7 @@ export default function useSideNavLinks({
       schedulesConfig != null &&
       schedulesConfig !== false &&
       !(typeof schedulesConfig === 'object' && schedulesConfig.use === false);
-    if (hasAccessToSchedules && schedulesEnabled) {
+    if (sidePanelEntries?.schedules !== false && hasAccessToSchedules && schedulesEnabled) {
       links.push({
         title: 'com_ui_schedules',
         label: '',
@@ -166,7 +170,7 @@ export default function useSideNavLinks({
       });
     }
 
-    if (hasAccessToPrompts) {
+    if (sidePanelEntries?.prompts !== false && hasAccessToPrompts) {
       links.push({
         title: 'com_ui_prompts',
         label: '',
@@ -176,7 +180,7 @@ export default function useSideNavLinks({
       });
     }
 
-    if (hasAccessToMemories && hasAccessToReadMemories) {
+    if (sidePanelEntries?.memories !== false && hasAccessToMemories && hasAccessToReadMemories) {
       links.push({
         title: 'com_ui_memories',
         label: '',
@@ -186,7 +190,7 @@ export default function useSideNavLinks({
       });
     }
 
-    if (hasAccessToBookmarks) {
+    if (sidePanelEntries?.bookmarks !== false && hasAccessToBookmarks) {
       links.push({
         title: 'com_sidepanel_conversation_tags',
         label: '',
@@ -196,15 +200,18 @@ export default function useSideNavLinks({
       });
     }
 
-    links.push({
-      title: 'com_sidepanel_attach_files',
-      label: '',
-      icon: AttachmentIcon,
-      id: 'files',
-      Component: FilesPanel,
-    });
+    if (sidePanelEntries?.files !== false) {
+      links.push({
+        title: 'com_sidepanel_attach_files',
+        label: '',
+        icon: AttachmentIcon,
+        id: 'files',
+        Component: FilesPanel,
+      });
+    }
 
     if (
+      sidePanelEntries?.parameters !== false &&
       interfaceConfig.parameters === true &&
       isParamEndpoint(endpoint ?? '', endpointType ?? '') === true &&
       !isAgentsEndpoint(endpoint) &&
@@ -220,8 +227,9 @@ export default function useSideNavLinks({
     }
 
     if (
-      (hasAccessToUseMCPSettings && availableMCPServers && availableMCPServers.length > 0) ||
-      hasAccessToCreateMCP
+      sidePanelEntries?.mcpServers !== false &&
+      ((hasAccessToUseMCPSettings && availableMCPServers && availableMCPServers.length > 0) ||
+        hasAccessToCreateMCP)
     ) {
       links.push({
         title: 'com_nav_setting_mcp',
@@ -264,6 +272,7 @@ export default function useSideNavLinks({
     hasAccessToCreateMCP,
     includeHidePanel,
     hidePanel,
+    sidePanelEntries,
   ]);
 
   return Links;
