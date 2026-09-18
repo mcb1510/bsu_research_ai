@@ -1,0 +1,81 @@
+# Dev stack: hot-reloading backend + frontend, isolated from prod.
+#
+# Usage:
+#   docker compose -f docker-compose.dev.yml build
+#   docker compose -f docker-compose.dev.yml up -d
+#   docker compose -f docker-compose.dev.yml logs -f
+#   docker compose -f docker-compose.dev.yml down
+
+services:
+  dev-api:
+    container_name: dev-api
+    image: bsu-research-ai-dev:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: npm run backend:dev
+    ports:
+      - "3080:3080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - .env
+    environment:
+      - HOST=0.0.0.0
+    volumes:
+      - .:/app
+      - dev_root_node_modules:/app/node_modules
+      - dev_api_node_modules:/app/api/node_modules
+      - dev_client_node_modules:/app/client/node_modules
+      - dev_dp_node_modules:/app/packages/data-provider/node_modules
+      - dev_ds_node_modules:/app/packages/data-schemas/node_modules
+      - dev_pkgapi_node_modules:/app/packages/api/node_modules
+      - dev_pkgclient_node_modules:/app/packages/client/node_modules
+      - dev_dp_dist:/app/packages/data-provider/dist
+      - dev_ds_dist:/app/packages/data-schemas/dist
+      - dev_pkgapi_dist:/app/packages/api/dist
+      - dev_pkgclient_dist:/app/packages/client/dist
+
+  dev-client:
+    container_name: dev-client
+    image: bsu-research-ai-dev:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: npm run frontend:dev
+    ports:
+      - "3090:3090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - .env
+    environment:
+      - PORT=3090
+      - BACKEND_PORT=3080
+      - HOST=0.0.0.0
+    volumes:
+      - .:/app
+      - dev_root_node_modules:/app/node_modules
+      - dev_api_node_modules:/app/api/node_modules
+      - dev_client_node_modules:/app/client/node_modules
+      - dev_dp_node_modules:/app/packages/data-provider/node_modules
+      - dev_ds_node_modules:/app/packages/data-schemas/node_modules
+      - dev_pkgapi_node_modules:/app/packages/api/node_modules
+      - dev_pkgclient_node_modules:/app/packages/client/node_modules
+      - dev_dp_dist:/app/packages/data-provider/dist
+      - dev_ds_dist:/app/packages/data-schemas/dist
+      - dev_pkgapi_dist:/app/packages/api/dist
+      - dev_pkgclient_dist:/app/packages/client/dist
+
+volumes:
+  dev_root_node_modules:
+  dev_api_node_modules:
+  dev_client_node_modules:
+  dev_dp_node_modules:
+  dev_ds_node_modules:
+  dev_pkgapi_node_modules:
+  dev_pkgclient_node_modules:
+  dev_dp_dist:
+  dev_ds_dist:
+  dev_pkgapi_dist:
+  dev_pkgclient_dist:
