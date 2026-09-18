@@ -1,6 +1,7 @@
-import { WebSearchToolDefinition, CalculatorToolDefinition } from '@librechat/agents';
+import { CalculatorToolDefinition } from '@librechat/agents';
 import type { ExtendedJsonSchema } from './schema';
 import { AskUserQuestionToolDefinition } from '~/agents/hitl/askUserQuestionTool';
+import { DdgsWebSearchToolDefinition } from '~/tools/toolkits/web';
 import { geminiToolkit } from '~/tools/toolkits/gemini';
 import { oaiToolkit } from '~/tools/toolkits/oai';
 
@@ -442,10 +443,10 @@ const agentToolDefinitions: Record<string, ToolRegistryDefinition> = {
     schema: CalculatorToolDefinition.schema as unknown as ExtendedJsonSchema,
     toolType: 'builtin',
   },
-  [WebSearchToolDefinition.name]: {
-    name: WebSearchToolDefinition.name,
-    description: WebSearchToolDefinition.description,
-    schema: WebSearchToolDefinition.schema as unknown as ExtendedJsonSchema,
+  [DdgsWebSearchToolDefinition.name]: {
+    name: DdgsWebSearchToolDefinition.name,
+    description: DdgsWebSearchToolDefinition.description,
+    schema: DdgsWebSearchToolDefinition.schema as unknown as ExtendedJsonSchema,
     toolType: 'builtin',
   },
   [AskUserQuestionToolDefinition.name]: {

@@ -3,7 +3,6 @@ const { logger } = require('@librechat/data-schemas');
 const {
   checkAccess,
   assertDirectToolOutputAllowed,
-  loadWebSearchAuth,
   isContentFilterError,
   isActiveExpirationDate,
   getConversationExpirationDate,
@@ -20,7 +19,6 @@ const { processFileURL, uploadImageBuffer } = require('~/server/services/Files/p
 const { getRetentionExpiry } = require('~/server/services/Files/retention');
 const { processCodeOutput, runPreviewFinalize } = require('~/server/services/Files/Code/process');
 const { preflightCodeOutputBatch } = require('~/server/services/Files/Code/preflight');
-const { loadAuthValues } = require('~/server/services/Tools/credentials');
 const { loadTools } = require('~/app/clients/tools/util');
 
 /**
@@ -35,37 +33,18 @@ const toolAccessPermType = {
 };
 
 /**
- * Verifies web search authentication, ensuring each category has at least
- * one fully authenticated service.
+ * `web_search` runs on the DDGS-backed tool (see
+ * `packages/api/src/tools/toolkits/web.ts`), which is keyless — no per-user or
+ * per-deployment provider credential to verify. Always report
+ * system-authenticated so the client proceeds straight to the call without a
+ * key-entry dialog, mirroring `execute_code` below.
  *
  * @param {ServerRequest} req - The request object
  * @param {ServerResponse} res - The response object
  * @returns {Promise<void>} A promise that resolves when the function has completed
  */
-const verifyWebSearchAuth = async (req, res) => {
-  try {
-    const appConfig = req.config;
-    const userId = req.user.id;
-    /** @type {TCustomConfig['webSearch']} */
-    const webSearchConfig = appConfig?.webSearch || {};
-    const result = await loadWebSearchAuth({
-      userId,
-      loadAuthValues,
-      webSearchConfig,
-      throwError: false,
-    });
-
-    return res.status(200).json({
-      authenticated: result.authenticated,
-      authTypes: result.authTypes,
-      searchProvider: result.authResult.searchProvider,
-      scraperProvider: result.authResult.scraperProvider,
-      rerankerType: result.authResult.rerankerType,
-    });
-  } catch (error) {
-    console.error('Error in verifyWebSearchAuth:', error);
-    return res.status(500).json({ message: error.message });
-  }
+const verifyWebSearchAuth = async (_req, res) => {
+  return res.status(200).json({ authenticated: true, message: AuthType.SYSTEM_DEFINED });
 };
 
 /**

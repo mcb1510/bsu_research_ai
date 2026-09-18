@@ -1,5 +1,5 @@
 const { logger, getTenantId } = require('@librechat/data-schemas');
-const { Calculator, createSearchTool, createCodeExecutionTool } = require('@librechat/agents');
+const { Calculator, createCodeExecutionTool } = require('@librechat/agents');
 const {
   checkAccess,
   toolkitParent,
@@ -9,7 +9,6 @@ const {
   createAuthIdentityContext,
   selectMCPUpstreamTokenProvider,
   mcpToolPattern,
-  loadWebSearchAuth,
   splitMCPToolKey,
   buildServerNameAliases,
   findShadowedServerNames,
@@ -22,7 +21,7 @@ const {
   DELETE_MEMORY_TOOL_NAME,
   createAskUserQuestionTool,
   ASK_USER_QUESTION_TOOL_NAME,
-  resolveWebSearchSSRFAgents,
+  createDdgsWebSearchTool,
   buildWebSearchDynamicContext,
   codeExecutionAuthHeaders,
   resolveCodeExecutionContext,
@@ -188,7 +187,6 @@ const getAuthFields = (toolKey) => {
  * @param {Array<string>} params.tools
  * @param {boolean} [params.functions]
  * @param {boolean} [params.returnMap]
- * @param {AppConfig['webSearch']} [params.webSearch]
  * @param {AppConfig['fileStrategy']} [params.fileStrategy]
  * @param {AppConfig['imageOutputType']} [params.imageOutputType]
  * @returns {Promise<{ loadedTools: Tool[], toolContextMap: Object<string, any>, dynamicToolContextMap?: Object<string, any> } | Record<string,Tool>>}
@@ -204,7 +202,6 @@ const loadTools = async ({
   options = {},
   functions = true,
   returnMap = false,
-  webSearch,
   fileStrategy,
   imageOutputType,
 }) => {
@@ -450,31 +447,10 @@ const loadTools = async ({
       };
       continue;
     } else if (tool === Tools.web_search) {
-      const result = await loadWebSearchAuth({
-        userId: user,
-        loadAuthValues,
-        webSearchConfig: webSearch,
-      });
-      if (!result.authenticated) {
-        logger.warn('[handleTools] Skipping web search because authentication is incomplete.');
-        continue;
-      }
-      const { onSearchResults, onGetHighlights } = options?.[Tools.web_search] ?? {};
-      const { httpAgent, httpsAgent } = resolveWebSearchSSRFAgents(
-        result.authResult,
-        webSearch?.allowedAddresses,
-      );
       requestedTools[tool] = async () => {
         toolContextMap[tool] = buildWebSearchContext();
         dynamicToolContextMap[tool] = buildWebSearchDynamicContext(options.req?.turnStartedAt);
-        return createSearchTool({
-          ...result.authResult,
-          httpAgent,
-          httpsAgent,
-          onSearchResults,
-          onGetHighlights,
-          logger,
-        });
+        return createDdgsWebSearchTool();
       };
       continue;
     } else if (tool === ASK_USER_QUESTION_TOOL_NAME) {
